@@ -8787,6 +8787,80 @@ return BWTC;
 
 <script type="text/javascript">//<![CDATA[
 window.addEvent('load', function() {
+
+document.getElementById("fileToRead").addEventListener("change",function(){
+  var file = this.files[0];
+
+  if (file) {
+      var reader = new FileReader();
+
+      reader.onload = function (evt) {
+        console.log(evt);
+        document.getElementById("textbox").value = endianMark + evt.target.result;
+      };
+
+      reader.onerror = function (evt) {
+        console.error("An error ocurred reading the file",evt);
+      };
+
+      reader.readAsText(file, "UTF-16BE");
+    }
+},false);
+
+document.getElementById('download').addEventListener('click', function(){
+if (document.getElementById("base64textarea").value.includes(endianMark)) {
+
+	downloadUtf16(document.getElementById("base64textarea").value.substring(1), document.getElementById("B3Kfilename").value) 
+	}
+	else {
+	downloadUtf16(document.getElementById("base64textarea").value, document.getElementById("B3Kfilename").value) 
+	}
+	
+});
+
+function downloadUtf16(str, filename) {
+
+	// ref: https://stackoverflow.com/q/6226189
+	var charCode, byteArray = [];
+
+	// BE BOM
+  byteArray.push(254, 255);
+
+	// LE BOM
+  // byteArray.push(255, 254);
+
+  for (var i = 0; i < str.length; ++i) {
+  
+    charCode = str.charCodeAt(i);
+    
+    // BE Bytes
+    byteArray.push((charCode & 0xFF00) >>> 8);
+    byteArray.push(charCode & 0xFF);
+    
+    // LE Bytes
+    // byteArray.push(charCode & 0xff);
+    // byteArray.push(charCode / 256 >>> 0);
+  }
+  
+  var blob = new Blob([new Uint8Array(byteArray)], {type:'text/plain;charset=UTF-16BE;'});
+  var blobUrl = URL.createObjectURL(blob);
+  
+	// ref: https://stackoverflow.com/a/18197511
+  var link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = filename;
+
+  if (document.createEvent) {
+    var event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    link.dispatchEvent(event);
+  } else {
+    link.click();
+  }
+}
+
+
+
 //  0x0000 - 0x18ff => 0x3400 - 0x4cff
 //  0x1900 - 0x69ff => 0x4e00 - 0x9eff
 //  0x6a00 - 0x8000 => 0xac00 - 0xc200
@@ -9166,22 +9240,30 @@ function hex2uint8(h) {
 <body>
   <div>
   <div>
-    <label for="filePicker">Choose or drag a (tar) file:</label>
+    <label for="filePicker">Choose or drag a (tar) file to encode:</label>
     <br>
   </div>
           <input id="filePicker" type="file"><textarea id="ascii85password">Enter a password here before uploading.</textarea>
   <br>
   <div>
-    <h1>Base32768 encoded version</h1>
-    <textarea id="base64textarea" placeholder="Base32768 will appear here" cols="50" rows="15"></textarea>
+    <h1>BWTC32Key encoded version</h1>
+    <textarea id="base64textarea" placeholder="Base32768 will appear here" cols="50" rows="15"></textarea><br>
+	<p>B3K filename:</p>
+	
+	<textarea id="B3Kfilename">myFile.B3K</textarea>
+	<button id="download">Download .B3K of above textbox</button>
   </div>
 </div>
-<textarea id="textbox">Type Base32768 encoded text here to decode</textarea><button id="create">Click to decode file</button><br />
+<h3>Decoding:</h3>
+<p>Upload a B3K file here:</p>
+<input type="file" id="fileToRead">
+<br>
+<textarea id="textbox" cols="25" >Type BWTC32Key-encoded text here to decode</textarea><button id="create">Click to decode file</button><br />
+<p>Output's Filename & MIMEtype</p>
 <textarea id="filename">output.bin</textarea>
 <textarea id="filetype">application/octet-stream</textarea><br />
- <a download="output.bin" id="downloadlink" style="display: none">Download</a>
-
-  
+ <a download="output.bin" id="downloadlink" style="display: none">Download decoded file</a>
+ 
   <script>
   // tell the embed parent frame the height of the content
   if (window.parent && window.parent.parent){
