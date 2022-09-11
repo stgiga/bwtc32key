@@ -9062,6 +9062,7 @@ function hex2uint8(h) {
     var pre = "\u4d00";
 var suf = "\u4d01";
 var re = new RegExp(endianMark+pre+"(.+?)"+suf);
+var re2 = new RegExp(pre+"(.+?)"+suf);
 key_256 = hex2uint8(sha256(document.getElementById("ascii85password").value));
   
 var aesCoder = new aesjs.ModeOfOperation.ctr(key_256, new aesjs.Counter(1));
@@ -9197,16 +9198,23 @@ function hex2uint8(h) {
   var textFile = null,
     makeTextFile = function(text) {
         var m = text.match(re);
+		var m2 = text.match(re2);
 	
     var aesDecoder = new aesjs.ModeOfOperation.ctr(key_256, new aesjs.Counter(1));
-        if (!m)
+        if (!m && !m2)
             {
                 alert('Invalid decoder input!');
             };
+	if (m) {		
       var data = new Blob([BWTC.decompressFile(aesDecoder.decrypt(base32768dec(text.substr(1).slice(1, -1))))], {
         type: document.getElementById('filetype').value
       });
-
+}
+else if (m2) {
+      var data = new Blob([BWTC.decompressFile(aesDecoder.decrypt(base32768dec(text.slice(1, -1))))], {
+        type: document.getElementById('filetype').value
+      });
+}
       // If we are replacing a previously generated file we need to
       // manually revoke the object URL to avoid memory leaks.
       if (textFile !== null) {
