@@ -9064,7 +9064,7 @@ var suf = "\u4d01";
 var re = new RegExp(endianMark+pre+"(.+?)"+suf);
 var re2 = new RegExp(pre+"(.+?)"+suf);
 key_256 = hex2uint8(sha256(document.getElementById("ascii85password").value));
-  
+var compLevel = document.getElementById("complevel").value;  
 var aesCoder = new aesjs.ModeOfOperation.ctr(key_256, new aesjs.Counter(1));
   
 var handleFileSelect = function(evt) {
@@ -9079,7 +9079,7 @@ var handleFileSelect = function(evt) {
       var arrayBuffer = readerEvt.target.result;
       array = new Uint8Array(arrayBuffer),
         //var binaryString = readerEvt.target.result;
-        document.getElementById("base64textarea").value = endianMark+pre+base32768enc(aesCoder.encrypt(BWTC.compressFile(array, undefined, 9)))+suf;
+        document.getElementById("base64textarea").value = endianMark+pre+base32768enc(aesCoder.encrypt(BWTC.compressFile(array, undefined, compLevel)))+suf;
     };
 
     reader.readAsArrayBuffer(file);
@@ -9253,6 +9253,7 @@ else if (m2) {
   </div>
           <input id="filePicker" type="file"><textarea id="ascii85password">Enter a password here before uploading.</textarea>
   <br>
+<p>Compression Level (1-9): <input type="text" cols="1" placeholder="9" id="complevel"></input></p>
   <div>
     <h1>BWTC32Key-encoded version</h1>
     <textarea id="base64textarea" placeholder="Base32768 will appear here" cols="50" rows="15"></textarea><br>
