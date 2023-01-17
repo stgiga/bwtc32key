@@ -6048,8 +6048,51 @@ abbr,acronym { border:0;}
 
   <title>BWTC32Key encode/decode a file</title>
 
-<script>
+
+  
+</head>
+
+<body>
+  <div>
+  <div>
+    <label for="filePicker">Choose or drag a (tar) file to encode:</label>
+    <br>
+  </div>
+          <input id="filePicker" type="file"><textarea id="ascii85password" name="ascii85password" oninput="">Enter a password here before uploading.</textarea>
+  <br>
+<p>Compression Level (1-9): <input type="number" min="1" max="9" value="9"id="complevel"></input></p>
+  <div>
+    <h1>BWTC32Key-encoded version</h1>
+    <textarea id="base64textarea" placeholder="Base32768 will appear here" cols="50" rows="15"></textarea><br>
+	<p>B3K filename:</p>
+	
+	<textarea id="B3Kfilename">myFile.B3K</textarea>
+	<button id="download">Download .B3K of above textbox</button>
+  </div>
+</div>
+<h3>Decoding:</h3>
+<p>Upload a B3K file here:</p>
+<input type="file" id="fileToRead">
+<br>
+<textarea id="textbox" cols="25" >Type BWTC32Key-encoded text here to decode</textarea><button id="create">Click to decode file</button><br />
+<p>Output's Filename & MIMEtype</p>
+<textarea id="filename">output.bin</textarea>
+<textarea id="filetype">application/octet-stream</textarea><br />
+ <a download="output.bin" id="downloadlink" style="display: none">Download decoded file</a>
  
+  <script>
+  // tell the embed parent frame the height of the content
+  if (window.parent && window.parent.parent){
+    window.parent.parent.postMessage(["resultsFrame", {
+      height: document.body.getBoundingClientRect().height,
+      slug: "None"
+    }], "*")
+  }
+  
+</script>
+
+<script>
+ var compLevel = document.getElementById("complevel").value;
 /**
  * [js-sha256]{@link https://github.com/emn178/js-sha256}
  *
@@ -9074,7 +9117,7 @@ BWTC.compressFile = Util.compressFileHelper(BWTC.MAGIC, function(input, output, 
   var encoder = new RangeCoder(output);
   encoder.encodeStart(finalByte, 1);
 
-  var blockSize = 9;
+  var blockSize = document.getElementById("complevel").value;
   if (typeof(props) === 'number' && props >= 1 && props <= 9) {
     blockSize = props;
   }
@@ -9482,8 +9525,7 @@ function hex2uint8(h) {
 var suf = "\u4d01";
 var re = new RegExp(endianMark+pre+"(.+?)"+suf);
 var re2 = new RegExp(pre+"(.+?)"+suf);
-
-var compLevel = document.getElementById("complevel").value;  
+var compLevel = document.getElementById("complevel").value;
 
 var handleFileSelect = function(evt) {
   var files = evt.target.files;
@@ -9498,6 +9540,7 @@ var handleFileSelect = function(evt) {
       array = new Uint8Array(arrayBuffer),
         //var binaryString = readerEvt.target.result;
 		
+compLevel = document.getElementById("complevel").value,
         document.getElementById("base64textarea").value = endianMark+pre+base32768enc(new aesjs.ModeOfOperation.ctr(sha256.array(document.getElementById("ascii85password").value), new aesjs.Counter(1)).encrypt(BWTC.compressFile(array, undefined, compLevel)))+suf;
     };
 
@@ -9662,49 +9705,6 @@ else if (m2) {
 
 
 </script>
-
-  
-</head>
-
-<body>
-  <div>
-  <div>
-    <label for="filePicker">Choose or drag a (tar) file to encode:</label>
-    <br>
-  </div>
-          <input id="filePicker" type="file"><textarea id="ascii85password" name="ascii85password" oninput="">Enter a password here before uploading.</textarea>
-  <br>
-<p>Compression Level (1-9): <input type="text" cols="1" placeholder="9" id="complevel"></input></p>
-  <div>
-    <h1>BWTC32Key-encoded version</h1>
-    <textarea id="base64textarea" placeholder="Base32768 will appear here" cols="50" rows="15"></textarea><br>
-	<p>B3K filename:</p>
-	
-	<textarea id="B3Kfilename">myFile.B3K</textarea>
-	<button id="download">Download .B3K of above textbox</button>
-  </div>
-</div>
-<h3>Decoding:</h3>
-<p>Upload a B3K file here:</p>
-<input type="file" id="fileToRead">
-<br>
-<textarea id="textbox" cols="25" >Type BWTC32Key-encoded text here to decode</textarea><button id="create">Click to decode file</button><br />
-<p>Output's Filename & MIMEtype</p>
-<textarea id="filename">output.bin</textarea>
-<textarea id="filetype">application/octet-stream</textarea><br />
- <a download="output.bin" id="downloadlink" style="display: none">Download decoded file</a>
- 
-  <script>
-  // tell the embed parent frame the height of the content
-  if (window.parent && window.parent.parent){
-    window.parent.parent.postMessage(["resultsFrame", {
-      height: document.body.getBoundingClientRect().height,
-      slug: "None"
-    }], "*")
-  }
-  
-</script>
-
 
 
 
