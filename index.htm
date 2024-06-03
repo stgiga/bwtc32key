@@ -6078,8 +6078,8 @@ abbr,acronym { border:0;}
 <p>Upload a B3K file here:</p>
 <input type="file" id="fileToRead">
 <br>
-<textarea id="textbox" cols="25" >Type BWTC32Key-encoded text here to decode</textarea><button id="create">Click to decode file</button><br />
-<p>Output's Filename & MIMEtype</p>
+<!--<form name="b3k">--><textarea id="textbox" name="decinput" cols="25" >Type BWTC32Key-encoded text here to decode</textarea><button id="create">Click to decode file</button><br />
+<p>Output's Filename & MIMEtype <button id="textextract" onclick="copyOutputToClipboard2();" type="button">Copy above box</button></p><!--</form>-->
 <textarea id="filename">output.bin</textarea>
 <textarea id="filetype">application/octet-stream</textarea><br />
  <a download="output.bin" id="downloadlink" style="display: none">Download decoded file</a>
@@ -9706,6 +9706,7 @@ else if (m2) {
 
 });
 
+
 function copyOutputToClipboard() {
         var targetBox = document.BWTC32Key.base32768textarea;
         // https://stackoverflow.com/questions/51158061/copy-data-to-clipboard-without-selecting-any-text
@@ -9729,6 +9730,31 @@ function copyOutputToClipboard() {
         }
         // restore prior selection
         targetBox.setSelectionRange(origSelectionStart, origSelectionEnd);                        
+    };
+
+	function copyOutputToClipboard2() {
+        var targetBox2 = document.getElementById('textbox');
+        // https://stackoverflow.com/questions/51158061/copy-data-to-clipboard-without-selecting-any-text
+        // - restoring original selection doesn't seem to work        
+        var origSelectionStart, origSelectionEnd;
+        origSelectionStart = targetBox2.selectionStart;
+        origSelectionEnd = targetBox2.selectionEnd;
+        // select the content
+        var currentFocus = document.activeElement;
+        targetBox2.focus();
+        targetBox2.setSelectionRange(0, targetBox2.value.length);
+        var succeed;
+        try {
+            succeed = document.execCommand("copy");
+        } catch(e) {
+            succeed = false;
+        }
+        // restore original focus
+        if (currentFocus && typeof currentFocus.focus === "function") {
+            currentFocus.focus();
+        }
+        // restore prior selection
+        targetBox2.setSelectionRange(origSelectionStart, origSelectionEnd);                        
     };
 
 
