@@ -6047,9 +6047,21 @@ abbr,acronym { border:0;}
 
 
   <title>BWTC32Key encode/decode a file</title>
+<!--
+NOTE:CRED: This app uses a LOT of code out on the Web but after checking the details, including code that is now lost media, the whole project is GPL2. 
+TBD: RFCTR
+STORY: This app was written in 2019 by a teenager (stgiga, They/Them) who wanted to be able to encode files as text, & then decode them back to files, without using any server-side or compiled code. The teenager had no training with cryptography, compression, or encoding, but was interested in those things. The teenager also wanted to be able to share files with friends over text-based platforms that didn't allow binary files, like email or chat. The teenager found some code online for Base64, & then decided to try to implement their own encoding scheme that would be more efficient than Base64. They came up with BWTC32Key, which is a custom encoding scheme that uses a combination of compression, encryption, & Base32768 encoding. The teenager wrote the code in JavaScript so that it could run in the browser, & they also included some features like password protection & adjustable compression levels. The project was a learning experience for the teenager, & they shared it online for others to use & learn from as well.
+SEE: https://stgiga.github.io/ & http://stgiga.github.io/BWTC32Key & http://b3k.me + MIMEtype application/prs.bwtc32key
 
+MAGIC: This app is a bunch of code pieced together that somehow works.
 
-  
+IDEA: One of the main intended uses, of which MANY exist (including secrecy), are for hiding Easter eggs in a codebase. Such as this: 䴀酯靉뽮䐚葼俄獢㓭꿅㯹刎㞵㿩狰鄸禅扻銇拢術쇼例䛬縤鳸깯疕澜鱼껻䘿琧徿眍娼垎锔菒說衿뇘鱢弉삀葃㤱疤꽳袍瀫戗궿눞篷跑螘卻띹㭩錬辭䇜贶碪鬩鷷㸠轃耣䬴攦㬫꾤哬訛䢌聻섾榦뀟㫨豗녥䩾灜对狙撒柀笿紤뒜㫹駼竿뜲䍜欳櫨携봀锆傑颰뉉袕亁驿㸠뼝黇㘦蚈걝䁨覩䢐溬䯚藚蔸汃덿酪俊铟煰㞫诂拲孙藫砏隖磋䏪侒窀䮽酜鱋馶蚿佨럚䫓俼겋걲屍속뵖觀解姻것頦꾰驸䮴㔽差돡놡耖畝麄謆븭궎癇蟗袏憁媸狜딋紗㱬飮渠娇뇘땝搅膥鸌垼陾㐻夒袦飛䣗漛搂녘긨䆅毴聼剽烷㜡鮩䇋䝅蠀䴁
+SEE: https://stgiga.itch.io/BWTC32Key for usecases.
+
+FAQ: This code probably isn't government material. No, there are no backdoors.
+
+GLOSS: BWTC: Burrows-Wheeler Transform Compressor. 32K: Base32768. Key: encrypted
+-->
 </head>
 
 <body>
@@ -6059,6 +6071,19 @@ abbr,acronym { border:0;}
     <label for="filePicker">Choose or drag a (tar) file to encode:</label>
     <br>
   </div>
+  <!--NOBUG:CLEVER: yes, there is no length limit on this password box. Yes, it's UTF-8 rather than UTF-16BE. Yes, to not encrypt stuff, you can't touch the box, or you can blank it, or fill it with whitespace.
+
+NEEDSDOC: ALL
+FR: TAR
+RVD: sg
+!!!: Axing MooTools makes the UI fail.
+NOTE: This code uses 8bit ASCII for the filename & MIMEtype boxes, UTF16(BE) for the Base32768 strings, Uint8arrays as pipes between the compression, encryption, & Base32768 parts of the code, hex as a pipe between other parts deeper inside the UTF16 & Uint8array parts, as well as the password parts.
+
+XXX:SMELL:WKRD: The Compression Level box is a <number> since the only way to get what JavaScript sees to reflect what is in the box is to use a document.getElementById(), needing using a <number> element for type reasons. The "not updating" bug also affected the password box but this was fixed with the same document.getElementById() trick.
+
+XXX:SMELL:CAV: The implementation of AES256-CTR is quirky, & the use of SHA256 to generate its keys is also what you would expect for teenage code.
+
+INSPECT:XXX:QSTN:SMELL: Some of the code in this file potentially may not be needed, but it very well could be. Porting MooTools to C could get spicy-->
           <input id="filePicker" type="file"><textarea id="ascii85password" name="ascii85password" oninput="">Enter a password here before uploading.</textarea>
   <br>
 <p>Compression Level (1-9): <input type="number" min="1" max="9" value="9"id="complevel"></input></p>
@@ -9522,6 +9547,7 @@ function hex2uint8(h) {
   return a;
 }
   
+//NOTE:XXX: U+FEFF on newer Macs (not an issue on Snow Leopard but an issue on Mavericks and above) does not enter the clipboard when copied. An IF statement is used to mitigate this. 
 
     var endianMark = "\ufeff";
     var pre = "\u4d00";
@@ -9691,7 +9717,7 @@ else if (m2) {
         
       return textFile;
     };
-
+//NOTE:XXX: This IF statement is used to work around newer versions of macOS not copying U+FEFF to the clipboard. If the U+FEFF is not present, the code will attempt to decode without it.
 
   var create = document.getElementById('create'),
     textbox = document.getElementById('textbox');
