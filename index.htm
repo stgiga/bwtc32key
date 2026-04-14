@@ -6048,6 +6048,7 @@ SEE: https://stgiga.itch.io/BWTC32Key for usecases.
 FAQ: This code probably isn't government material. No, there are no backdoors.
 GLOSS: BWTC: Burrows-Wheeler Transform Compressor. 32K: Base32768. Key: encrypted
 -->
+
 </head>
 
 <body>
@@ -6127,7 +6128,7 @@ INSPECT:XXX:QSTN:SMELL: Some of the code in this file potentially may not be nee
     WINDOW = false;
   }
   var WEB_WORKER = !WINDOW && typeof self === 'object';
-  var NODE_JS = !root.JS_SHA256_NO_NODE_JS && typeof process === 'object' && process.versions && process.versions.node;
+  var NODE_JS = !root.JS_SHA256_NO_NODE_JS && typeof process === 'object' && process.versions && process.versions.node && process.type != 'renderer';
   if (NODE_JS) {
     root = global;
   } else if (WEB_WORKER) {
